@@ -2,7 +2,7 @@
   <div class="hello">
     <Form ref="formInline" :model="formInline" :rules="ruleInline" inline>
         <FormItem prop="user">
-            <Input type="text" v-model="formInline.user" placeholder="Username"  style="margin-bottom:30px !important; margin-top: 100px !important;">
+            <Input type="text" v-model="formInline.email" placeholder="Username"  style="margin-bottom:30px !important; margin-top: 100px !important;">
                 <Icon type="ios-person-outline" slot="prepend"></Icon>
             </Input>
         </FormItem>
@@ -21,17 +21,17 @@
 </template>
 
 <script>
-import * as Server from './../api/server'
+import Server from './../api/server'
 export default {
   name: 'login',
   data () {
            return {
                formInline: {
-                   user: '',
+                   email: '',
                    password: ''
                },
                ruleInline: {
-                   user: [
+                   email: [
                        { required: true, message: '请填写用户名', trigger: 'blur' }
                    ],
                    password: [
@@ -51,20 +51,38 @@ export default {
                          data: self.formInline
                        })
                        .then(data => {
+
+                         data && data.msg && this.$Message.success(data.msg);
+                         if(data.ok) {
+                           this.$router.push('/')
+                         }
                          console.log(data);
                        })
                        .catch(err => {
                          console.log(err);
                        })
-                       this.$Message.success('提交成功!');
+                    
                    } else {
                        this.$Message.error('表单验证失败!');
                    }
                })
+
+
+
            }
        },
        created() {
-         console.log(Server)
+         Server.get({
+           url: '/user/checklogin'
+         })
+         .then(res => {
+           if (res.ok) {
+             this.$router.push('/')
+           }
+         })
+         .catch(e => {
+           console.log(e)
+         })
        }
 }
 </script>

@@ -16,8 +16,23 @@
 </template>
 
 <script>
+import Server from './../api/server'
 export default {
-  name: 'navbar'
+  name: 'navbar',
+  created() {
+    Server.get({
+      url: '/user/checklogin'
+    })
+    .then(res => {
+      if (!res.ok) {
+           this.$Message.success(res.msg);
+        this.$router.push('/login')
+      }
+    })
+    .catch(e => {
+      console.log(e)
+    })
+  }
 }
 </script>
 

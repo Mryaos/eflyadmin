@@ -1,6 +1,7 @@
 import axios from 'axios'
+import utils from './../utils/utils'
 
-const host = 'http://software.efly.nenu.edu.cn/homework';
+const host = 'http://112.74.36.142';
 
 const isUrlExist = data => !!data.url;
 
@@ -10,10 +11,12 @@ const Server = {
       console.log('参数错误');
       return false;
     }
+    
+    options.withCredentials = true;
 
-    axios.get(host + options.url, options.data || {})
+    return axios.get(host + options.url, options.data || {})
       .then(data => {
-        return data;
+        return data.data;
       })
       .catch(err => {
         throw Error(`${options.url}请求出错`)
@@ -26,9 +29,20 @@ const Server = {
       return false;
     }
 
-    axios.post(host + options.url, options.data || {}, options.config || {})
+    if (!options.headers) {
+        options.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+        options.withCredentials = true;
+    }
+
+    if (options.data) {
+      options.data = utils.formatData(options.data);
+    }
+
+    return axios.post(host + options.url, options.data || options.config || {})
       .then(data => {
-        return data;
+        return data.data;
       })
       .catch(err => {
         throw Error(`${options.url}请求出错`)
@@ -36,4 +50,4 @@ const Server = {
   }
 }
 
-module.exports = Server;
+export default Server;
